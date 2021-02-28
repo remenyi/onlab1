@@ -1,0 +1,41 @@
+Hallgató neve:         Reményi Gergely Márk
+Neptun kódja:          KPZH44
+Email címe:            gergo@gergo.city
+Konzulens(ek) neve:    Maliosz Markosz, Simon Csaba
+Önlab tantárgy kódja:  VITMML00
+Tanév/félév:           2020/2021. 2. félév
+
+Feladat/téma címe: Felhő rendszerek: konténerek és hálózatok
+
+Tervezett munkafázisok a félév során:
+
+1-3. oktatási hét:
+  Kubernetes működésének, komponenseinek és konfigurálhatóságának áttekintése.
+  Kubernetes cluster telepítése.                                           
+                                                                           
+4. oktatási hét:                                                           
+  Terheléselosztás és a skálázódás (Horizontal Pod Autoscaling, Kubernetes
+  Event-driven Autoscaling) lehetőségeinek áttekintése Kubernetesben különböző
+  metrikák alapján.                                              
+                                                                           
+5. oktatási hét:                                                           
+  Egyedi metrikák alapján történő skálázáshoz tesztrendszer tervezése a
+  Kubernetesben a terheléselosztás és skálázódás ellenőrzésére.                                                             
+6-8. oktatási hét:                                                         
+  A tesztrendszer implementálása. Skálázandó szolgáltalások, alkalmazások
+  kiválasztása és telepítése.                                     
+9. hét:
+  Terhelés generálás megvalósítása, mérések elvégzése, eredmények kiértékelése.
+                                                                           
+10. oktatási hét:                                                          
+  Írásbeli beszámoló elkezdése.                                            
+                                                                           
+11. oktatási hét:                                                          
+  Írásbeli beszámoló nulladik verzió elkészítése konzulensnek.             
+                                                                           
+12-13. oktatási hét:                                                       
+  A legalább egyszer iterált irásbeli beszámoló végleges, kijavított verziójának
+  beadása, a szóbeli elkészítese.                   
+                                                                           
+14. oktatási hét:
+  Szóbeli és írásbeli beszámoló.
