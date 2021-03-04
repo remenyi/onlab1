@@ -1,10 +1,11 @@
-#Kubernetes
+# Kubernetes
 
-##Gépek:
+## Gépek
+
 - node1:
-    - ip: 172.23.115.138/20
+      - ip: 172.23.115.138/20
 - Konfig:
-    - statikus ip: `sudo nvim /etc/netplan/99_config.yaml` fájlba
+      - statikus ip: `sudo nvim /etc/netplan/99_config.yaml` fájlba
 
     `network:
        version: 2
@@ -22,28 +23,39 @@
 - hosztnév beállítása a hoszton: Windowsos `/etc/hosts`, ami `C:/Windows/System32/drivers/etc/hosts`
 - fájlok másolása: WSL-ből scp-vel pl.: scp . gergo@node1/home/gergo/onlab1
 
-##Komponensek
-###Control Plane komponensek
+## Komponensek
+
+### Control Plane komponensek
+
 Az egész cluster működéséért felelősek, minden node-on jelen lehetnek
+
 - kube-apiserver
 - etcd: k-v tároló cluster konfigurációnak
 - kube-scheduler: pod ütemező
 - kube-controller-manager: ellenőrzi/irányítja a clustert (pl.: lehalt-e egy node, fel kell-e éleszteni podokat egy feladat elvégzéséhez, mely service-k és podok tartoznak össze) 
 - cloud-controller-manager: kapcsolat a felhő API-val
-###Node komponensek
+
+### Node komponensek
+
 Minden Node-on futnak
+
 - kubelet: podok futásáért felel
 - kube-proxy: hálózati proxy az os fölött, amellyel megvalósíthatóak a service-k
 - Container runtime: konténereket futtat (pl.: docker, containerd)
-###Kiegészítők
+
+### Kiegészítők
+
 - DNS: Dns rekordok service-eknek
 - Dashboard: webes felület
 - Container Resource Monitoring: konténer monitorozás idősoros metrika alapján
 - Cluster-level Logging: konténerek logjai központi adatbázisba
 
-##Objektumok
+## Objektumok
+
 A cluster állapotát reprezentálják
-###Objektum konfiguráció
+
+### Objektum konfiguráció
+
 - Példa egy deploymentre
 
     `apiVersion: apps/v1 # API verzió
@@ -66,6 +78,6 @@ A cluster állapotát reprezentálják
                ports:
                - containerPort: 80`
 
-- egyes objektumokhoz tartozó konfig (itt)[https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.20/]
+- egyes objektumokhoz tartozó konfig [itt](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.20/)
 - Labels: k-v értékek hozzácsatolása egy objektumhoz
 - Selectors: objektumok kiválasztása labelek alapján
