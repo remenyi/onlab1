@@ -1,0 +1,14 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "node-hpa-example.fullname" . }}
+  labels:
+    {{- include "node-hpa-example.labels" . | nindent 4 }}
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: monitoring
+  endpoints:
+  - port: http
+  - path: /metrics
