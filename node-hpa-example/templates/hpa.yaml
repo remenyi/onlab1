@@ -29,7 +29,7 @@ spec:
     - type: Pods
       pods:
         metric:
-          name: http_requests
+          name: http_requests_per_second
         target:
           type: AverageValue
           averageValue: {{ .Values.autoscaling.targetHTTPRequests }}
