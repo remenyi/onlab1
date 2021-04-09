@@ -4,7 +4,6 @@ metadata:
   name: {{ include "node-hpa-example.fullname" . }}
   labels:
     {{- include "node-hpa-example.labels" . | nindent 4 }}
-    app: monitoring
 spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
@@ -12,6 +11,7 @@ spec:
   selector:
     matchLabels:
       {{- include "node-hpa-example.selectorLabels" . | nindent 6 }}
+      app: monitoring
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -20,6 +20,7 @@ spec:
       {{- end }}
       labels:
         {{- include "node-hpa-example.selectorLabels" . | nindent 8 }}
+        app: monitoring
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
