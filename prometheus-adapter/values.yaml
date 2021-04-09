@@ -59,15 +59,26 @@ resources: {}
   #   memory: 128Mi
 
 rules:
-  default: true
-  custom: []
-# - seriesQuery: '{__name__=~"^some_metric_count$"}'
-#   resources:
-#     template: <<.Resource>>
-#   name:
-#     matches: ""
-#     as: "my_custom_metric"
-#   metricsQuery: sum(<<.Series>>{<<.LabelMatchers>>}) by (<<.GroupBy>>)
+  default: false
+  custom:
+  - seriesQuery: 'http_requests_total{namespace!="",pod!=""}'
+    resources:
+      overrides:
+        namespace: {resource: "namespace"}
+        pod: {resource: "pod"}
+    name:
+      matches: "^(.*)_total"
+      as: "${1}_per_second"
+    metricsQuery: sum(rate(<<.Series>>{<<.LabelMatchers>>}[2m])) by (<<.GroupBy>>)
+  #- seriesQuery: 'http_request_duration_seconds_.*{namespace!="", pod!=""}'
+    #resources:
+      #overrides:
+        #namespace: {resource: "namespace"}
+        #pod: {resource: "pod"}
+    #name:
+      #matches: "http_request_duration_seconds_(.*)$"
+      #as: "http_response_time_per_second"
+    #metricsQuery: sum(rate(http_request_duration_seconds_sum{<<.LabelMatchers>>}[2m])) by (instance) / sum(rate(http_request_duration_seconds_count{<<.LabelMatchers>>}[2m])) by (instance)
   # Mounts a configMap with pre-generated rules for use. Overrides the
   # default, custom, external and resource entries
   existing:
