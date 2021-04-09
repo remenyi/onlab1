@@ -18,6 +18,6 @@ docker push $TAG
 echo "Updating helm chart ${HELMCHART}"
 helm install $HELMCHART ../$HELMCHART || helm uninstall $HELMCHART && helm install $HELMCHART ../$HELMCHART
 
-echo "Port forwarding kubernetes service ${SERVICE} to port ${PORT}"
-sleep 10 # Waiting for pod running state
-kubectl port-forward services/$SERVICE $PORT
+#echo "Port forwarding kubernetes service ${SERVICE} to port ${PORT}"
+#sleep 10 # Waiting for pod running state
+#kubectl port-forward services/$SERVICE $PORT

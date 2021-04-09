@@ -51,5 +51,4 @@ app.get("/getload", (req, res) => {
 res.send("OK!");
 });
 
-app.listen(PORT, HOST);
-console.log(`Running on http://${HOST}:${PORT}`);
+app.listen(PORT, () => console.log(`Running on http://${HOST}:${PORT}`) );
