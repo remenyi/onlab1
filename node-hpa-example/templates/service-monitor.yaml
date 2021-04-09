@@ -11,4 +11,4 @@ spec:
       app: monitoring
   endpoints:
   - port: http
-  - path: /metrics
+  #- path: /metrics
