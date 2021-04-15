@@ -90,10 +90,60 @@ jelszó: `prom-operator`
 
 ## Terhelésgenerálás
 
-- Az alkalmazás elérése reverse proxy-val: `kubectl port-forward services/node-hpa-example 8080`
+Ez port-forwardinggal nem működik, mert mindig csak egy podot port-forwardingol, így nem működik a terheléseloszlás sem.
 
-- Terhelésgenerálás:
+A k6-nak van kubernetes operátora, igaz, csak béta állapotban.
+
+Viszont a k6 operátor használata újabb nehézségekkel jár.
+
+  - Telepítés:
 
   ```
-  while true; do sleep 0.01; curl localhost:8080/getLoad; done
+  kubectl config get-contexts
+  make deploy
   ```
+
+  - Terhelés teszt futtatása:
+
+    1. teszt írása pl. test.js file-ba
+
+    2. configmap generálása a tesztfájlból:
+
+    ```
+    kubectl create configmap crocodile-stress-test --from-file test.js
+    ```
+
+    3. custom resource írása, amivel az operátor megtalálja a tesztfájlt tartalmazó configmapot 
+
+    ```
+    apiVersion: k6.io/v1alpha1
+    kind: K6
+    metadata:
+      name: k6-sample
+    spec:
+      parallelism: 4                  # mennyi jobot generáljon
+      script: crocodile-stress-test   # mi a tesztfájlt tartalmazó configmap neve
+      separate: false                 # futhatnak-e egy node-on a jobok
+      arguments: ""                   # cli-nek megfelelő argumentumok
+    ```
+
+    4. custom resource deploymentje
+
+    ```
+    kubectl apply -f custom-resource.yml
+    ```
+
+    5. ellenőrzés:
+
+    ```
+    kubectl get k6
+    kubectl get jobs
+    kubectl get pods
+    kubectl logs [az egyik pod, igazából tök mindegy melyik]
+    ```
+
+    6. Szemétszedés:
+
+    ```
+    kubectl delete -f custom-resource.yml
+    ```
