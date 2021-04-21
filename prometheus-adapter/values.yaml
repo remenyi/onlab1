@@ -8,7 +8,7 @@ image:
 
 logLevel: 4
 
-metricsRelistInterval: 1m
+metricsRelistInterval: 10s
 
 listenPort: 6443
 
