@@ -43,12 +43,29 @@ app.use(promMid({
   // },
 }));
 
-app.get("/getload", (req, res) => {
-  let x = 0.0001;
-  for (let i = 0; i < 1000000; i++){
-    x += Math.sqrt(x.toString());
-  }
-res.send("OK!");
+
+
+app.get("/getload", async (req, res) => {
+  await (() => {
+    let x = 0.0001;
+    for (let i = 0; i < 1000000; i++){
+      x += Math.sqrt(x.toString());
+    }
+  });
+  res.send("OK!");
 });
+
+app.get("/getlight", async (req, res) => {
+  res.send("OK!");
+});
+
+fs = require('fs');
+fs.readFile("bigfile.txt", (err, data) => {
+  app.get("/getdata", async (req, res) => {
+    res.send(data);
+  });
+});
+
+
 
 app.listen(PORT, () => console.log(`Running on http://${HOST}:${PORT}`) );
