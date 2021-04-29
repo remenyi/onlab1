@@ -80,12 +80,13 @@
 %-----------
 \usepackage[colorlinks=true]{hyperref}
 
+\usepackage{float}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Itt kezdődik maga a dokumentum
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{document}
 \input{onlabmacros} % Ez kell!!!
-\markright{Beszámoló Péter (BPOX43)} % egyoldalas fejléc!!!
+\markright{Reményi Gergely Márk (KPZH44)} % egyoldalas fejléc!!!
 %--------------------------------------------------------------------
 % fedlap
 %--------------------------------------------------------------------
@@ -117,32 +118,24 @@
 
  
   %\szerzo argumentumok: #1=Név, #2=Neptunkód, #3=szakirány, #4=email,#5 konzulens-1, #6 konzulens-1-email, #7 konzulens-2, #8 konzulens-2-email
-  \onlabszerzo{Beszámoló Péter}{BPOX43}{Ilyen-olyan szak}{user@example.com}{Dr. Péhádes István}{pehades@tmit.bme.hu}{Doktor Andusz}{doktora@tmit.bme.hu}
+  \onlabszerzo{Reményi Gergely Márk}{KPZH44}{Mérnökinformatikus szak}{gergo@gergo.city}{Maliosz Markosz}{markosz@tmit.bme.hu}{Simon Csaba}{simon@tmit.bme.hu}
  
  
 %\feladatcim argumentuma a feladat rövid, 1 soros címe
-  \feladatcim{Írásbeli beszámoló készítése az Önálló laboratórium
-    tárgyhoz} 
+  \feladatcim{Skálázás Kubernetesben egyedi HTTP metrikák alapján} 
 
   <A címnek nem kell megegyeznie az eredeti téma címével,
-  fontosabb hogy tényleges feladatra utaljon.>
-
 
   %\feladatmaga argumentuma a feladat 1-2 bekezdésnyi ismertetése
-  \feladatmaga{<Ezen a helyen a hallgató adott félévre vonatkozó
-    feladatának a leírását várjuk.  A hallgató ezt idemásolhatja a
-    feladatkiírásból, esetleg a munkatervéből, de megadhatja saját
-    szavaival is.  Ha a munkatervéből másolja ide, akkor folyószöveggé
-    kell szerkeszteni az időrendi bontást. A feladat leírása ne
-    csússzon át a 2. oldalra és ezáltal a tanév sem. A feladatleírás
-    legyen konkrét, definiálja, hogy mit várunk el a félév végére és
-    ne legyen felsorolás-szerű.>}
+  \feladatmaga{A hallgató feladata egyedi metrikák alapján történő horizontális skálázás vizsgálata Kubernetes környezetben.
+              A hallgató a félév során megismerkedik a Horizontal Pod Autoscaler (HPA) technológiával, kiépíti és konfigurálja
+              Kubernetesben az egyedi metrikákat létrehozó csővezetéket. TODO}
 
  
   %\tanevfelev argumentumok:
   % #1=Tanév (xxxx/xx alakban), #2=félév (pont nélkül!)
   
-  \tanevfelev{2016/17}{I}
+  \tanevfelev{2020/2021}{II}
  
 \end{titlepage} 
 
@@ -155,245 +148,170 @@
 \subsection{Bevezető}
 \label{sec:bevezeto}
 
-<Mit kell tudni a feladatról, esetleges elméleti bevezető (nagyon
-értelemszerű dolgokat ne definiáljunk, de jó, ha egy kicsit
-kontextusba kerül a témakör, miért fontos ez nekünk, mi volt eddig,
-milyen megoldások jöhetnek szóba és miért emellett döntöttünk, milyen
-kari nagyobb projektbe kapcsolódik ez), stb. Terjedelem max. 50\%
-beszámolónak.>
-
-Ennek a résznek az a szerepe, hogy az olvasó számára megmutassa az
-elvégzett munka tágabb környezetét. Ez a rész lehet megegyező tartalmú
-más, ugyanazon a témán dolgozó hallgatókéval, de akkor mindenképpen
-tüntessük fel, hogy kivel dolgoztatok együtt, és hogy pontosan, hogy
-osztottátok meg a munkát.
-
 \subsection{Elméleti összefoglaló}
-
-Amikor a tágabb tudományos vagy műszaki környezetről beszélünk, akkor
-azt értjük alatta, hogy ,,művelt laikus'' -- alapesetben ennek
-tekinthető a tárgyfelelős -- megtalálja azokat a kapcsolódási
-pontokat, amelyek segítségével az ő ismereteihez a beszámolóban
-tárgyalt témakör és az elvégzett munka csatlakoztatható.  Ez
-mindenképpen, szükséges, hiszen enélkül az olvasónak előzetes
-tájékozódást kellene végeznie a szűkebb szakterületen, hogy az
-elvégzett munka jellegét, súlyát, nehézségét meg tudja ítélni.
-
-Természetesen a terjedelmi korlátok miatt nem lehet teljes mértékben
-bemutatni az adott szűkebb szakterületet, ezért meg kell adni az
-érdeklődő olvasónak a lehetőséget a további tájékozódásra.  Részben
-erre szolgálnak a hivatkozások\footnote{A másik nagyon fontos céljuk
-  az állítások alátámasztása.  A lábjegyzetek használatát egyébként
-  nem érdemes túlzásba vinni, mert állandóan megtörik az olvasás
-  folyamatát (lásd például \cite{esterhazy}).  Akkor kell használni,
-  amikor a lábjegyzetben közlendő információ érdekes lehet, de nem
-  tartozik közvetlenül a tárgyhoz.  Mindenképpen kerülendő az irodalmi
-  hivatkozások lábjegyzetben való megadása.}, lábjegyzetek.
-
-Nagyon fontos, hogy abban az esetben, amikor a hallgató féléves
-munkájának egy része vagy egésze az, hogy tanul, hogy maga is
-ismerkedik azzal a szakterülettel, amelyen dolgozni fog, akkor az
-tudatosan törekedjen arra, hogy az Elméleti összefoglaló és az
-Elvégzett munka ismertetése szétválasztható legyen.  Az előbbinek a
-szakterület alapvető, általános ismereteit kell tartalmaznia,
-amelyekről a ,,művelt laikusnak'' részleges ismeretei lehetnek.  Míg
-az elvégzett munka leírásába azoknak a specifikus ismereteknek a
-bemutatása kerülhet, amelyek a később elvégzett vagy elvégzendő
-feladatokat konkrétan megalapozzák.
-
-További tanulmányozásra ajánljuk Eco professzor művét~\cite{eco}.
-
-A hivatkozások kezelésénél fontos, hogy mindig a mondat részeként
-tekintsünk rá, és ha szükséges, akár többször is hivatkozzunk meg egy
-forrást, de az első előfordulásakor mindenképpen.  Ugyanez érvényes a
-rövidítésekre: minden rövidítést a legelső előforduláskor magyarázni
-kell, később viszont használhatók a rövidített formák is.  Például: a
-Tiger Tree Hash (TTH) a hashelés egy speciális formája.
-
-\subsection{A munka állapota, készültségi foka a félév elején}
-\label{sec:munka-allap-kesz}
-
-Ebben a részben lehet megadni a korábbi félévekben elvégzett munkát
-is.  Így világosan elkülöníthető az aktuális félévtől.  Nem kell
-hosszasan írni, de ne legyen felsorolás sem.  Egy bekezdésben kellene
-itt leírni, hogy foglalkoztál-e már ezzel a témával, a tanszéken
-dolgozott-e már valaki rajta.  Írd le azt is, hogy mit kaptál kézhez
-hozzá segítségként.
 
 \newpage
 %==================================================================
-\section{Az elvégzett munka és az eredmények ismertetése}
+\section{Mérések elvégzése}
 \label{sec:az-elvegzett-munka}
 
+\subsubsection{Mérésekhez beállított alapértelmezett értékek}
 
-\subsection{A munkám ismertetése logikus fejezetekre tagoltan}
-\label{sec:a-munkam-ismert}
-<Én magam (nem a társam) a félév során következőket olvastam el /
-programoztam / készítettem el / teszteltem / dokumentáltam / néztem át
-/ tanultam meg, stb.  Tételes leírása és felsorolása mindannak, ami a
-félév során történt, alátámasztandó azon állításom a
-konzulens/tárgyfelelős felé, hogy összességében mindent beleértve
-tényleg dolgoztam a TVSZ szerint kreditenként 30 órát, azaz a heti 2
-kontakt órás tárgy esetében min. $2,5*30 = 75$ munkaórát, illetve a
-heti 6 kontakt órás tárgy esetében min. $8*30 = 240$ munkaórát\dots>
+A minden mérés elvégzéséhez egyetlen k6 tesztet definiáltam. Ebben a tesztben
+a kapcsolatot kialakító virtuális felhasználók száma 10 perc alatt lineárisan növekedik
+0-tól 100-ig, majd 30 másodperc alatt visszaesik 0-ra. Minden virtuális
+felhasználó egytized másodpercenként küld el egy HTTP GET kérést.
 
-Ebben a részben a hallgató az általa elvégzett munkát mutatja
-be. Hangsúlyosan a saját munka bemutatása a cél, hiszen a hallgató
-ezzel igazolja a témavezető és a tárgyfelelős irányába, hogy --
-folyamatosan fejlődve és egyre több és jobb munkát végezve -- a
-szakdolgozatát/diplomadolgozatát képes lesz megírni.  A beszámoló nem
-munkanapló, nem arra vagyunk kíváncsiak, hogy mit mikor csinált a
-hallgató és mennyi időt töltött vele, hanem egy eredmény-centrikus
-beszámolót szeretnénk olvasni.  De itt is fontos tudni, hogy
-megosztott feladat esetén ki-mit csinált, mekkora részt vállalt.
+A podokat úgy állítottam be, hogy 300 millicore legyen a limitjük, vagyis a
+node CPU-jának maximum $3/10$-ad számítási kapacitását használhatják. A
+podoknak még megadtam azt is, hogy csak olyan node-okon indulhatnak el,
+amelyeken van még 100 millicore-nyi szabad kapacitás.
 
-Az egész beszámoló elkészítésénél törekedni kell a magyar nyelv
-szabályainak követésére és a műszaki dokumentáció/tudományos közlemény
-írásával kapcsolatosan kialakult közmegegyezés szerinti formai
-követelmények betartására.  (Tehát nem kell többes számként hivatkozni
-saját magunkra, kerülni kell a furcsa megfogalmazást, passzív és egyéb
-kifacsart mondatszerkezeteket.  Az egy szót határozatlan névelőként
-történő használatakor ne írjuk ki számként.)
+\subsubsection{CPU alapú skálázás rövid válaszidejű végponton}
+\label{secsec:cpu_scaling}
+
+A CPU alapú skálázáshoz úgy állítottam be a HPA-t, hogy 50\% alatt maradjon a
+podok CPU igénye. Ez az 50\%-os küszöb a podok CPU limitjének kontextusában
+értelmezendő, vagyis ha egy pod limitje 300 millicore, akkor a HPA feladata
+lesz, annyi új podot indítani, hogy a podok átlagos CPU erőforrás igénye 150
+millicore alatt maradjon.
+
+A teszt lefutásához négy diagramot hoztam létre Grafanában, amelyek
+szükségesek a CPU alapú skálázás vizsgálatához és amellyel össze lehet vetni
+az egyedi metrikák alapján skálázódó teszt adatait.
 
 
-A beszámoló természetesen nem csak szöveget tartalmazhat, hanem
-képleteket, táblázatokat, ábrákat és még sok minden mást.  Ezek
-kapcsán az alábbi elvek irányadók:
-\begin{itemize}
-\item Az ábráknak, képeknek és táblázatoknak mindig van számuk és
-  címük. (A cím nem ennyi: ,,1. ábra'', hanem azt írd le, ami látható
-  rajta.)
+\Aref{light_cpu_hpa} diagramon láthatóak a HPA által kívánt podok száma (desired
+replicas) és a podok tényleges száma (current replicas).  A diagramon csak
+egy adatsor látszik, mivel a két metrika együtt mozog.  A diagramon látható
+az is, hogy a HPA nem skálázza le a podokat egyből, hanem kivárja az
+alapértelmezetten beállított 5 perces lehűlési időt.
 
-\item Az ábrákra, a képekre és a táblázatokra a szövegben hivatkozni
-  kell, és a szövegben elemezni kell azokat. Például
-  \aref{fig:fig1}.~ábrán látszik, hogy a vizsgált félévben még két
-  napos csúszással is lehetett jeles érdemjegyet szerezni a tárgyból,
-  de a pontosság még nem garancia a jó jegyre: öten nem kaptak jelest,
-  noha nem késtek a leadással.
-
-\item Az ábrák, képek és táblázatok mérete a szükségesnek megfelelő
-  legyen: elég nagy ahhoz, hogy kinyomtatva is olvasható és
-  értelmezhető legyen, de nem nagyobb annál, mint amit szerepe
-  indokol.
-
-\item A grafikonoknak a tengelyeken legyenek feliratai és ha releváns,
-  a mértékegység is.
-
-\item A képletek esetében nem minden képletre történik hivatkozás, de
-  ahol igen, ott a képletet a műszaki irodalomban jellemző módon a sor
-  végére tett kerek zárójelben lévő számmal jelöljük meg.  A
-  képleteket ne képként illeszd be a szövegbe.
-
-\item Kódrészleteket, ha nem relevánsak, ne illeszd be képként, főleg
-  ne rossz minőségben. Nyugodtan teheted függelékbe és hivatkozd be a
-  szövegben, mint a képeket, például: Az 1.~számú függelékben
-  található az adatbeolvasó kód, melyet C++ nyelven készítettem el.
-\end{itemize}
-
-Az írásbeli beszámolót a témavezető és a tárgyfelelős is értékeli. A
-tárgyfelelősi értékelés szempontjai az alábbiak:
-\begin{enumerate}
-\item Megfelel-e az elvégzett munka a félév elején kiadott feladatnak?
-\item Megfele-e a beszámoló a formai követelményeknek? Ezen belül:
-  \begin{itemize}
-  \item a. Megfelelő-e az elméleti bevezető és az irodalomjegyzék?
-  \item b. Egyértelmű-e, hogy mi volt a hallgató saját munkája?
-  \item c. Megfelelő-e a dokumentum technikai színvonala?
-  \end{itemize}
-
-\end{enumerate}
-Ezen kívül a tárgyfelelős veszi figyelembe az értékelés során
-kialakult félévi jegyre vonatkoztatva az ún. ,,hanyagsági faktor''
-értékét, amelyet (\ref{eq:1}) szerint állapítunk meg:
-
-\begin{equation}
-    F_{hany} = 1 - a - b
-  \label{eq:1}
-\end{equation}
-
-
-\begin{figure}[tbh]
+\begin{figure}[H]
   \centering
-  \includegraphics[]{fig1.eps}
-  \caption{Hallgatók érdemjegyeinek eloszlása az írásbeli beszámoló késése függvényében}
-  \label{fig:fig1}
+  \includegraphics[width=\textwidth]{light_cpu_hpa.PNG}
+  \caption{HPA által kívánt és tényleges podok száma}
+  \label{light_cpu_hpa}  
 \end{figure}
 
-Az (\ref{eq:1})-ben szereplő a szám a munkaterv beadásában történt
-késedelemre, míg a b szám az írásbeli beszámoló beadásában történt
-késedelemre vonatkozik.  Utóbbi értékeiről
-\aref{tab:hanyagsagi}.~táblázat tájékoztat.
+\Aref{light_cpu_cpu} diagramon látható a skálázott podok CPU kihasználtsága.  A kék
+színű grafikon jelöli az összes pod CPU kihasználtságát, a többi ugyanezt
+podokra levetítve.  Az ábráról leolvasható, hogy a teljes CPU kihasználtság
+maximuma 1250m.  Ezt leosztva a replikák számával, vagyis 10-el, 125m-et
+kapunk, azaz a HPA jól működött, mert az átlagos CPU kihasználtság nem ment
+150m fölé. Azonban egyenként megvizsgálva a podok CPU használatát, vannak
+olyan podok, amelyek elérik, és sokáig a 300m-es tartományban maradnak és
+olyanok, amelyek a 100m-es tartományban maradnak.  Ebből látható, hogy a
+Kubernetesben a terheléselosztás nem egyenletesen történik.
 
-\begin{table}
+\begin{figure}[H]
   \centering
-    \begin{tabular}{|l|c|}
-      \hline
-      Az írásbeli beszámoló beadásának napja     & A ,,b'' faktor értéke \\
-      a szóbeli beszámolóhoz képest (munkanapban) & ~ \\ \hline          
-      -4.~munkanap & $0.04$ \\ \hline 
-      -3.~munkanap & $0.09$ \\ \hline 
-      -2.~munkanap & $0.20$ \\ \hline 
-      -1.~munkanap & $0.30$ \\ \hline
-      \end{tabular}
-    \caption{Az írásbeli beszámoló késedelmes beadásával kapcsolatos hanyagsági faktor értéke}
-  \label{tab:hanyagsagi}
-\end{table}
+  \includegraphics[width=\textwidth]{light_cpu_cpu.PNG}
+  \caption{Kiszolgáló podok CPU kihaszáltsága}
+  \label{light_cpu_cpu}  
+\end{figure}
 
-A beszámoló értékeléséről részletesebben írunk \cite{web}-ban.
+\Aref{light_cpu_response_time} diagramon az átlagos válaszidő látható podokra bontva.  Szinte az
+összes pod kezdetben magasabb válaszidővel válaszol, ez lehet a NodeJS
+Express valamilyen sajátossága miatt.  A válaszidők a teszt közepe felé egyforma
+értékeket vesznek fel, majd kettő pod kivételével az összes pod válaszideje
+megnő.  Ez amiatt lehet, mert a terhelésgenerálás olyan fázisba ért, ahol a
+kéréseket a podok nem tudják azonnal kiszolgálni.
 
-A beszámolóban bizonyára szerepelni fognak rövidítések. Ezeket a
-rövidítéseket, betűszavakat néhány, az infokommunikáció területén
-nagyon ismert és gyakran használt kifejezéstől (például IP, TCP, GPRS,
-UMTS) eltekintve ki kell fejteni logikusan az első használat
-alkalmával (például így: ,,A GPS (Generalized Processor Sharing) egy
-ideális folyadékmodellen alapuló csomagütemező eljárás.'').
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{light_cpu_response_time.PNG}
+  \caption{Kiszolgáló podok válaszideje 1 másodpercre vetítve}
+  \label{light_cpu_response_time}  
+\end{figure}
 
-A beszámoló készítése során előfordulhat, hogy a hallgató úgy érzi,
-hogy alfejezetekkel tagolva jobban olvasható és érthető lenne a
-beszámoló.  Ennek akadálya nincs, de érdemes arra figyelni, hogy a
-túlzott tagolás sem tesz jót egy írásműnek, illetve hogy a címsorokban
-a rövidítések és a hivatkozások használata tilos.  Tartalomjegyzéket
-készíteni nem szükséges a beszámolóhoz, de nem is tilos, kivéve azt az
-esete, amikor nyilvánvalóan terjedelemnövelési célokat szolgál.
+\Aref{light_cpu_response_count} diagramon az átlagos válaszok száma látható.
+A zöld színű grafikon jelöli az összes pod átlagos válaszainak számát.  Ez a
+diagram a teszt szerint elvárt módon növekszik a 17:28-as időpontig, majd a
+válaszok arányában stagnáció áll be.  \Aref{light_cpu_response_time}
+diagrammal összevetve így arra lehet következtetni, hogy a stagnáció szintén
+a podokra nehezedő terhelés következménye.
 
-A beszámoló terjedelme tárgyanként változhat.  Általános szabály, hogy
-1 hüvelyknél nagyobb margókat ne használjunk.  A szöveg legyen
-egyszeres sortávú, sorkizárt és 12 pontos betűméretű.  A bekezdések
-kezdődjenek behúzással a minta szerint.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{light_cpu_response_count.PNG}
+  \caption{Kiszolgáló podok válaszainak száma 1 másodpercre vetítve}
+  \label{light_cpu_response_count}  
+\end{figure}
+
+\subsubsection{Skálázás az átlagos válaszok számának függvényében}
+\label{secsec:custom_scaling}
+
+Az egyedi metrikára az átlagos válaszok számát választottam.  Az előző
+mérésből \aref{light_cpu_response_count} ábra alapján az átlagos válaszok
+számának küszöbét a HPA-ban 500-ra állítottam.
+
+A teszt lefutásához ugyanazokat a diagramokat hoztam létre, mint a CPU alapú
+skálázásnál \aref{secsec:cpu_scaling} fejezetben.
+
+\Aref{light_custom_hpa} ábrán a HPA által kívánt és tényleges podok száma
+látható.  Összevetve \aref{light_cpu_hpa} ábrával a podok száma sokkal
+lassabban növekszik, és csak hat podot használ ki a maximális tízből.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{light_custom_hpa.PNG}
+  \caption{HPA által kívánt és tényleges podok száma}
+  \label{light_custom_hpa}  
+\end{figure}
+
+\Aref{light_custom_cpu} ábrán látható CPU kihasználtságot összevetve
+\aref{light_cpu_cpu} ábrán látható CPU kihasználtsággal látható, hogy az
+egyéni metrikákkal történő skálázásnál a CPU kihasználtság sokkal jobban
+követi a tesztben is definiált lineáris terhelést, valamint a CPU terhelés kisebb, mint a
+CPU alapú slálázás esetében.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{light_custom_cpu.PNG}
+  \caption{Kiszolgáló podok CPU kihaszáltsága}
+  \label{light_custom_cpu}  
+\end{figure}
+
+\Aref{light_custom_response_time} ábrán látható válaszidőket összevetve
+\aref{light_cpu_response_time} ábrán látottakkal, a válaszidők a teszt elején
+még nagyjából megegyeznek, a 0.1-0.2 ms tartományba esnek.  Az egyéni
+metrikákkal történő skálázásnál is megnőnek a válaszidők a teszt végére,
+azonban ez sokkal később történik meg, és csak két podnál emelkedik
+számottevően.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{light_custom_response_time.PNG}
+  \caption{Kiszolgáló podok válaszideje 1 másodpercre vetítve}
+  \label{light_custom_response_time}  
+\end{figure}
+
+\Aref{light_custom_response_count} ábrán is megfigyelhető
+\aref{light_custom_cpu} ábrához hasonló lineáris növekedés, azaz a válaszok
+átlagos száma is jól követi a tesztben definiált terhelés növekedését.
+Azonban itt is megfigyelhető, hogy mivel a HPA a podok válaszainak egy
+másodpercre vetített számának átlagát veszi, a podok válaszainak száma nem
+lesz 500 alá szorítva.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{light_custom_response_count.PNG}
+  \caption{Kiszolgáló podok válaszainak száma 1 másodpercre vetítve}
+  \label{light_custom_response_count}  
+\end{figure}
 
 \subsection{Összefoglalás}
 \label{sec:osszefoglalas}
 
-A félévi munka során elért új eredmények ismételt, vázlatos, tömör
-Ebben a részben az adott félévre vonatkozó, az \emph{Önálló
-  laboratórium tárgy keretében elvégzett munka során} elért
-\textbf{új} eredmények ismételt, vázlatos, \textbf{tömör}
-összefoglalását várjuk, lehetőleg nem felsorolásként.  Itt még egyszer
-ki lehet térni a leglényegesebb eredményekre, valamint a félév során
-felmerülő nehézségekre, de meg lehet említeni a továbbfejlesztési
-irányokat, lehetőségeket is.
-
-Ezt a részt tagolható a következő pontok megválaszolásával:
-\begin{itemize}
-\item Mi volt az \textbf{aktuális kérdés}, probléma, amivel a félév
-  során foglalkoztál?
-\item Mi a dolgozat \textbf{célja}, miért érdekes egyáltalán ezzel a
-  problémával foglalkozni?
-\item Milyen \textbf{módszereket} használtál a probléma megoldása
-  érdekében?
-\item Mik a legfontosabb \textbf{eredmények}?
-\item Milyen \textbf{következtetéseket} lehet levonni?
-
-\end{itemize}
-
-Ha valaki elolvassa ezt a részt, képet kell kapnia az egész
-dolgozatról.  Ne legyen az absztrakt szó szerinti ismétlése.
-
-Fontos, hogy az itt megadott sablontól el lehet térni, használata nem
-kötelező, csak segítséget jelenthet, viszont a fedőlap lehetőleg
-maradjon ugyanez és tartalmilag egyezzen meg a sablon irányelveivel. A
-beszámoló felépítésében nem érdemes eltérni a \emph{Bevezető --
-  Féléves munka és eredmények bemutatása -- Összefoglaló} hármastól.
+\Aref{secsec:cpu_scaling} részben bemutattam egy CPU alapú skálázást és
+\aref{secsec:custom_scaling} részben egy HTTP válaszok átlagos száma alapján
+történő skálázást.  A tesztek futásakor kapott metrikák azt mutatták, hogy a
+válaszok átlagos száma alapján történő skálázás CPU kihasználtságban és
+válaszidőben is jobb eredményeket produkált, mint a CPU alapú skálázás.  A
+mérésekből az a következtetés vonható le, hogy a tényleges terhelést leíró
+metrikákat használva jobb kihasználtságot és jobb metrikus adatokat lehet
+kapni az erőforrás alapú skálázáshoz képest.
 
 \newpage
  
@@ -403,12 +321,6 @@ beszámoló felépítésében nem érdemes eltérni a \emph{Bevezető --
 
 \begin{thebibliography}{9}
 \label{sec:tanulm-irod-jegyz}
-
-\bibitem{eco} Umberto Eco, \emph{Hogyan írjunk szakdolgozatot?},
-  Kairosz Kiadó, 2000, ISBN: 9639137537.
-
-\bibitem{esterhazy} Esterházy Péter, \emph{Termelési-regény (Kisssregény),}
-  Magvető Könyvkiadó, 2004, ISBN: 9631423948.
 
 \bibitem{web} \emph{Tájékoztató a Műszaki Informatika Szak önálló
     laboratórium tantárgyainak 2008/9. tanév I. félévi lezárásáról a
@@ -422,52 +334,9 @@ beszámoló felépítésében nem érdemes eltérni a \emph{Bevezető --
 
 \end{thebibliography}
 
-Itt jegyezném meg, hogy a tanulmányozott irodalmat hivatkozni kell a
-szövegben.  Szükség esetén többször is.  Az irodalomjegyzék célja
-(lásd \aref{sec:tanulm-irod-jegyz} fejezetet) ugyanis
-kettős\footnote{Akárcsak ennek a fejezet hivatkozásnak, ami a
-  \texttt{$\backslash$aref babel} parancsot demonstrálja}:
-\begin{enumerate}
-\item Az olvasó tájékoztatása, hogy a dokumentumban ki nem fejtett
-  dolgoknak, a tudottnak vélt ismereteknek hol lehet bővebben
-  utánanézni, így ott kell meghivatkozni az irodalmat~\cite{eco,
-    esterhazy}, ahová az irodalom kapcsolódik.
-\item Megmutatni a tárgyfelelosnek/konzulesnek az elolvasott irodalom
-  mennyiségét
-\end{enumerate}
-
-Javasoljuk, hogy a hallgatók tanulmányozzák, hogyan néznek ki a
-hivatkozások a villamosmérnöki/informatikai szakma vezető szakmai
-folyóirataiban megjelenő cikkekben.  Ebben a témavezető is biztosan
-tud segíteni.  A hivatkozás teljességére és egyértelműségére tessék
-ügyelni.  Például, ha egy könyvnek több, eltérő kiadása is van, akkor
-azt is meg kell jelölni, hogy melyik kiadásra hivatkozunk.  A webes
-hivatkozások problémásak szoktak lenni, de manapság egyre több az
-olyan dokumentum, ami csak weben lelhető fel, ezért használatuk nem
-zárható ki. Itt is törekedni kell azonban a pontosságra és a
-visszakereshetőségre. A weben található dokumentumoknak is van címe,
-szerzője, illetve érdemes megadni a letöltés/olvasás időpontját is,
-hiszen ezek a dokumentumok idővel megváltozhatnak.
-
-A wikipédiás hivatkozások használata nem javasolt, mert a wikipedia
-másodlagos forrás.  Tájékozodjuk a wikipédián, de aztán olvassuk el az
-adott oldalhoz megadott hivatkozásokat is.  A wikipedián külön szócikk
-foglalkozik azzal, hogy miért nem szerencsés tudományos munkákban a
-wikipédiára hivatkozni \cite{wikipedia}.
-
-Nem publikus dokumentumok hivatkozása nem javasolt és csak kivételes
-helyzetben elfogadható!
-
 %==================================================================
 \subsection{A csatlakozó dokumentumok jegyzéke}
 \label{sec:csat-irod}
-
-<A munka ezen beszámolóba be nem fért eredményeinek (például a forrás
-fájlok, mindenképpen csatolni akart forráskód részlet, felhasználói
-leírások, programozói leírások (API), stb.) megnevezése,
-fellelhetőségi helyének pontos definíciója, mely alapján a az
-erőforrás előkereshető -- értelemszerűen nem nyilvános dokumentumok
-hivatkozása nem elfogadható.>
 
 \end{document} 
 
