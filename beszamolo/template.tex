@@ -81,6 +81,8 @@
 \usepackage[colorlinks=true]{hyperref}
 
 \usepackage{float}
+\usepackage{mathtools}
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Itt kezdődik maga a dokumentum
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -146,8 +148,214 @@
 \subsection{Bevezető}
 \label{sec:bevezeto}
 
+A skálázás az egyik legkomplexebb és legfontosabb feladat (TODO:forrás) a
+számítástechnikában. A beszámolóban be fogom mutatni a Kubernetes konténer alapú
+alkalmazáskezelő rendszert és azokat a mechanizmusokat, amelyek  horizontális
+skálázást lehetővé teszik erőforrás (CPU, memória) és egyedi metrikák alapján.
+
+\Aref{secsec:kubernetes} fejezetben röviden bemutatom a Kubernetest, csak azokat
+az elemeit kiemelve, amelyek a skálázás bemutatásához szükségesek.
+\Aref{secsec:hpa} fejezetben részletesebben kifejtem a Kubernetesnek azt a
+komponensét, amely a lehtővé teszi a horizontális skálázást.
+\Aref{secsec:custom_metrics} fejezetben bemutatom annak a csővezetéknek az
+elemeit, amelyekkel megoldottam azt, hogy a Kubernetes egyedi metrikák alapján
+tudjon skálázódni. \Aref{secsec:k6} fejezetben bemutatom azt a terhelésgeneráló
+eszközt, amivel a skálázódást teszteltem. Végül \aref{sec:az-elvegzett-munka}
+fejezetben bemutatok egy CPU és egy egyedi metrikák alapján történő skálázást.
+
 \subsection{Elméleti összefoglaló}
 
+\subsubsection{Kubernetes}
+\label{secsec:kubernetes}
+
+A Kubernetes egy Google által fejlesztett konténer orchesztrációs rendszer
+\cite{kubernetes}, amely programok telepítését, skálázását, terheléselosztását
+és helyreállítását automatizálja. A Kubernetes konténer szinten operál, amelyek
+virtuális gépekhez hasonlítanak, azonban közös operációs rendszert használnak. A
+konténereknek külön fájlrendszerük, CPU, memória és processz névterük van, ezzel
+leválaszthatók a hoszt operációs rendszerről, amivel szabadon mozgathatóak
+lesznek operációs rendszerek között. A Kubernetes elosztott rendszer, a
+konténereket klaszterben futtatja. Minden klaszterben kiválasztásra kerül egy
+(vagy több) master node, amely egy olyan számítógép, amely az egész klaszter
+állapotáért felel. A klaszterben lévő többi számítógép worker node, ezeken
+futnak a konténerek.  Az alábbiakban bemutatom a Kubernetesnek azon
+komponenseit, amelyek szükségesek a konténerek automatikus horizontális
+skálázásának megvalósításához.
+
+\paragraph{Control plane}
+
+A control plane \cite{kubernetes-cp-and-node}, magyarul a vezérlési sík
+komponensei olyan processzekből állnak, amelyek a Kubernetes klaszter master
+node-ján futnak, és a klaszter állapotáért felelnek. Például elindítanak egy
+konténert, ha a klaszterben futó konténerek száma nem egyezik a konfigurációban
+megadott konténerek számával. A vezérlési sík az alábbi processzekből áll:
+
+\subparagraph{kube-apiserver}
+
+Elérhetővé teszi a Kubernetes API-t.
+
+\subparagraph{etcd}
+
+A klaszterről tárol információkat egy kulcs-érték adatbázisban.
+
+\subparagraph{kube-scheduler}
+
+Eldönti, hogy az újonnan létrehozott konténerek melyik node-ra legyenek ütemezve.
+
+\subparagraph{kube-controller-manager}
+
+Azért felel, hogy a konfigurációs fájlokban megadott állapot konzisztens legyen
+a klaszter állapotával. Például konténereket hoz létre vagy töröl.
+
+\paragraph{Node}
+
+A node-okon \cite{kubernetes-cp-and-node} futnak a klaszterbe telepített
+konténerek. Ehhez szükséges, hogy minden node-on legyen a konténer futtatását
+lehetővé tevő runtime (pl. Docker vagy containerd), valamint az alábbi
+processzek:
+
+\subparagraph{kubelet} A node-on futó konténerek állapotáért felel. A control
+plane utasításait követve biztosítja, hogy megfelelő számú egészséges konténer
+fusson a node-on.
+
+\subparagraph{Kube-proxy} Olyan hálózati beállításokért felel a node-on, amelyek
+a klaszterből kimenő, klaszterbe bemenő és a klaszteren belüli kommunikációt
+teszik lehetővé.
+
+\paragraph{Podok, replicasetek és deploymentek}
+
+A podok \cite{kubernetes-pods} Kubernetesben a legkisebb telepíthető számítási
+egység. Egy podban egy vagy több, szorosan összekapcsolódó konténer lehet.
+
+Minden podnak egyedi IP címe van, ami lehetővé teszi a podok közötti
+kommunikációt. A podokban lévő konténerek közvetlenül nem érhetnek
+el más konténereket, a kommunikáció mindig a podokon keresztül történik. Egy
+podon belül lévő konténerek viszont tudnak kommunkálni egymással a helyi
+hálózaton.
+
+Egy replicaset \cite{kubernetes-replicaset} objektummal lehet megadni a pod
+klaszterben futú másolatainak számát. \Aref{secsec:hpa} fejezetben bemutatott
+Horizontal Pod Autoscaler ezt az objektumot változtatja meg, amikor skálázódást
+hajt végre.
+
+Kubernetesben nem szokás külön pod és replicaset objektumokat létrehozni,
+helyettük egy deployment \cite{kubernetes-deployment} objektumban érdemes
+definiálni a telepítés kívánt állapotát, vagyis azt, hogy milyen konténerek
+kerüljenek a podokba, és a podok másolatának a számát. A deploymentek
+segítségével áramvonalassá válik a konténerek telepítése, frissítése, skálázása,
+leállítása és visszagörgetése korábbi verziókra.
+
+\paragraph{Service}
+
+Kubernetesben service \cite{kubernetes-service} objektumok segítségével lehet
+podokak elérni a klaszteren belül és kívülről.  A service-k podokhoz rendelt
+címkék (label \cite{kubernetes-labels}) alapján választják ki a hozzájuk tartozó
+podokat, amelyek között terheléseloszlást végeznek. Service-ekre azért van
+szükség, mert a podokhoz rendelt ip-címek nem biztosítanak megfelelő
+rugalmasságot.
+
+A service-eknek több típusa van:
+
+\begin{itemize}
+  \item ClusterIP: alapértelmezett service, csak a klaszteren belül érhető el.
+  \item NodePort: minden node-on nyit egy portot, amin keresztül elérthetőek a
+  podok.
+  \item LoadBalancer: klaszteren kívüli (tipikusan felhő) terheléselosztóján
+  teszi elérhetővé a service-t.
+\end{itemize}
+
+
+\subsubsection{Horizontal Pod Autoscaler}
+\label{secsec:hpa}
+
+A horizontal pod autoscaler \cite{kubernetes-hpa} (HPA) objektum segítségével
+lehet a podok számát skálázni Kubernetesben. A HPA alapértelmezetten tud cpu és
+memória metrikák alapján skálázódni, egyedi metrikák alapján történő skálázás
+körülményesebb, ezt \aref{secsec:custom_scaling} fejezetben mutatom be.
+
+A HPA az alábbi képlettel számolja ki a kívánt replikák számát:
+ 
+\begin{equation}
+  kivantreplikak = \ceil{jelenlegireplikak * \frac{jelenlegimetrikaerteke }{kivantmetrikaerteke}}
+\end{equation}
+
+
+\subsubsection{Skálázás egyedi metrikák alapján}
+\label{secsec:custom_metrics}
+
+A Google nem gondoz az egyedi metrikák alapján történő skálázásról kiterjedt
+dokumentációt, azonban újságcikkek alapján \cite{custom-metrics-1}
+\cite{custom-metrics-2} fel lehet építeni egy olyan csővezetéket, amely begyűjti
+a podok által generált metrikákat, és elérhetővé teszi a Kubernetes custom
+metrics API-ja számára.
+
+A legkézenfekvőbb megoldás Prometheus-t \cite{prometheus} használni a metrikák
+begyűjtétéhez, és Prometheus Adaptert \cite{promehteus-adapter} használni a
+begyűjtött adatok átalakítására a custom metrics API számára.
+\Aref{fig:custom-metrics} ábrán látható az a csővezeték, amelyen keresztül az
+egyedi metrikus adatoknak át kell menniük, hogy a HPA használni tudja őket.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{custom-metrics-pipeline.jpeg}
+  \caption{Egyedi metrikák csővezetéke}
+  \label{fig:custom-metrics}  
+\end{figure}
+
+A Prometheus nyílt forráskódú monitorozó és riasztó rendszer. Az idősoros
+adatokat a \emph{/metrics} végpontról gyűjti be a pull modell szerint az
+alkalmazásoktól, amiket PromQL \cite{promql} lekérdezőnyelvvel lehet lekérni. 
+
+A Prometheus telepítése Kubernetesbe a legegyszerűbben egy operátor
+\cite{operator} telepítésével végezhető. Kubernetesben az operátorok olyan
+alkalmazáscsomagok, amelyek automatizálják egy adott alkalmazás karbantartását.
+Mivel egy operátor sok komponensből áll, ezért célszerű Helmmel \cite{helm}
+telepíteni, ami egy csomagkezelő a Kuberneteshez. 
+
+A Promehteus pull modell szerint a \emph{/metrics} végpontokról gyűjti be a
+metrikus adatokat. A végpontok felfedezéséhez a Prometheus operátor
+\emph{ServiceMonitor} nevű custom resource-t \cite{custom-resource} definiál.
+Ebben meg kell adni a monitorozni kívánt podok címkéjét és portját, ahol a
+\emph{/metrics} végpont elérhető.
+
+A Prometheus operátor alapértelmezetten tartalmazza a Grafana \cite{grafana}
+nevű vizualizációs szoftvert, amelynek segítségével PromQL nyelven
+lekérdezhetőek és vizualizálhatóak a Prometheus által gyűjtött metrikák.
+\Aref{sec:az-elvegzett-munka} fejezetben szereplő ábrákat Grafanában hoztam
+létre.
+
+A Prometheus által gyűjtött metrikákat a Prometheus Adapter alakítja át a
+Kubernetes custom metrics API-ja számára. Az adapter konfigurációja
+\cite{prometheus-adapter-config} a következőképpen történik: 
+
+\begin{itemize}
+  \item Felfedezés: egy lekérdezés sablonját kell megadni, ami összegyűjti, hogy
+  milyen objektumokon lehet a lekérdezést elvégezni
+  \item Hozzárendelés: a felfedezésben begyűjtött objektumokat kell
+  hozzárendelni Kubernetes erőforrásokhoz
+  \item Megnevezés: meg kell adni a custom metrics API számára a metrika nevét
+  \item Lekérdezés: meg kell adni, hogy maga a lekérdezés hogyan történjen
+\end{itemize}
+
+\subsubsection{Terhelésgenerálás K6-al}
+\label{secsec:k6}
+
+A mérések elvégzéséhez k6 \cite{k6} nevű terhelésgeneráló alkalmazást
+választottam. Számomra az tette vonzóvá a k6-ot, hogy egy aktív közösség és
+vállalat áll mögötte.
+
+A k6-nak is van Kubernetes operátor csomagja \cite{k6-operator}, Bár még
+kísérleti fázisban van, ennek ellenére (egy-két kisebb hibán kívül) jól
+használható elosztott terhelési tesztek futtatására.
+
+Az operátor jelenlegi állapotában a tesztet szigorúan egy \emph{test.js}-nek
+elnevezett fájlban kell definiálni, ezután configmapként telepíteni kell a
+klaszterbe. A tesztet egy k6 típusú custom resource létrehozásával lehet
+elindítani. Ebben meg kell adni a configmap nevét, azt, hogy mennyi pod futtassa
+a teszteket és hogy futhassanak-e a podok külön node-okon. A podok létrehozása
+után még nem indul el a teszt, az összes k6 által létrehozott podon el kell
+indítani a teszteket a \verb|k6 resume| paranccsal.
+  
 \newpage
 %==================================================================
 \section{Mérések elvégzése}
@@ -166,7 +374,7 @@ CPU-jának maximum $3/10$-ad számítási kapacitását használhatják. A podok
 megadtam azt is, hogy csak olyan node-okon indulhatnak el, amelyeken van még 100
 millicore-nyi szabad kapacitás.
 
-\subsubsection{CPU alapú skálázás rövid válaszidejű végponton}
+\subsection{CPU alapú skálázás rövid válaszidejű végponton}
 \label{secsec:cpu_scaling}
 
 A CPU alapú skálázáshoz úgy állítottam be a HPA-t, hogy átlagosan 50\% alatt
@@ -323,15 +531,85 @@ gazdagabb szcenáriók kidolgozása és az eredmények alaposabb elemzése lesz.
 \begin{thebibliography}{9}
 \label{sec:tanulm-irod-jegyz}
 
-\bibitem{web} \emph{Tájékoztató a Műszaki Informatika Szak önálló
-    laboratórium tantárgyainak 2008/9. tanév I. félévi lezárásáról a
-    BME TMIT-en (VITMA367, VITMA380, VITT4353, VITT4330),}
-  \url{http://inflab.tmit.bme.hu/08o/lezar.shtml}, szerk.: Németh Felicián,
-  2008. november 5.
+\bibitem{kubernetes} \emph{What is Kubernetes?}
+  \url{http://inflab.tmit.bme.hu/08o/lezar.shtml}, szerk.: Google,
+  2021. február 1.
 
-\bibitem{wikipedia} Wikipedia contributors, \emph{Wikipedia:Academic
-    use}, Wikipedia, The Free Encyclopedia, 2011 Nov 11.  Available
-  from: \\ \url{http://en.wikipedia.org/w/index.php?title=Wikipedia:Academic\_use\&oldid=460041928}
+\bibitem{kubernetes-cp-and-node} \emph{Kubernetes Components}
+  \url{https://kubernetes.io/docs/concepts/overview/components/}, szerk.: Google,
+  2021. március 18.
+
+\bibitem{kubernetes-pods} \emph{Pods}
+  \url{https://kubernetes.io/docs/concepts/workloads/pods/}, szerk.: Google,
+  2021. január 12.
+
+\bibitem{kubernetes-replicaset} \emph{ReplicaSet}
+  \url{https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/}, szerk.: Google,
+  2021. április 16.
+
+\bibitem{kubernetes-deployment} \emph{Deployments}
+  \url{https://kubernetes.io/docs/concepts/workloads/controllers/deployment/}, szerk.: Google,
+  2021. február 11.
+
+\bibitem{kubernetes-service} \emph{Service}
+  \url{https://kubernetes.io/docs/concepts/services-networking/service/}, szerk.: Google,
+  2021. április 23.
+
+\bibitem{kubernetes-labels} \emph{Labels and Selectors}
+  \url{https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/}, szerk.: Google,
+  2021. április 22.
+
+\bibitem{kubernetes-hpa} \emph{Horizontal Pod Autoscaler}
+  \url{https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/}, szerk.: Google,
+  2021. március 25.
+
+\bibitem{custom-metrics-1} \emph{Kubernetes HPA with Custom Metrics from Prometheus}
+  \url{https://towardsdatascience.com/kubernetes-hpa-with-custom-metrics-from-prometheus-9ffc201991e}, szerk.: Cezar Romaniuc,
+  2021. június 26.
+  
+\bibitem{custom-metrics-2} \emph{Building Your Own Custom Metrics API for Kubernetes Horizontal Pod Autoscaler}
+  \url{https://medium.com/swlh/building-your-own-custom-metrics-api-for-kubernetes-horizontal-pod-autoscaler-277473dea2c1}, szerk.: Cezar Romaniuc,
+  2021. augusztus 31.
+
+\bibitem{prometheus} \emph{Overview}
+  \url{https://prometheus.io/docs/introduction/overview/}, szerk.:  Prometheus Authors,
+  2018. december 13.
+
+\bibitem{prometheus-adapters} \emph{Prometheus Adapter for Kubernetes Metrics APIs}
+  \url{https://github.com/kubernetes-sigs/prometheus-adapter/blob/master/README.md}, szerk.:  Prometheus Adapter Authors,
+  2020. november 6.
+
+\bibitem{promql} \emph{Querying Promehteus}
+  \url{https://prometheus.io/docs/prometheus/latest/querying/basics/}, szerk.: Prometheus Authors,
+  2021. május 4.
+
+\bibitem{operator} \emph{Operator pattern}
+  \url{https://kubernetes.io/docs/concepts/extend-kubernetes/operator/}, szerk.: Google,
+  2021. február 23.
+
+\bibitem{helm} \emph{Using Helm}
+  \url{https://helm.sh/docs/intro/using_helm/}, szerk.: Helm Authors,
+  2021. május 4.
+
+\bibitem{custom-resource} \emph{Custom Resources}
+  \url{https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/}, szerk.: Google,
+  2021. március 29.
+
+\bibitem{grafana} \emph{Grafana basics}
+  \url{https://grafana.com/docs/grafana/latest/basics/?pg=docs}, szerk.: Grafana Authors,
+  2021. május 4.
+
+\bibitem{prometheus-adapter-config} \emph{Configuration Walkthroughs}
+  \url{https://grafana.com/docs/grafana/latest/basics/?pg=docs}, szerk.: Prometheus Adapter Authors,
+  2020. október 28.
+
+\bibitem{k6} \emph{What is k6?}
+  \url{https://k6.io/docs/}, szerk.: k6 Authors,
+  2020. május 4.
+
+\bibitem{k6-operator} \emph{Running distributed k6 tests on Kubernetes}
+  \url{https://k6.io/docs/}, szerk.: Simon Aronsson,
+  2021. február 11.
 
 \end{thebibliography}
 
